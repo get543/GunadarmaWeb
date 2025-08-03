@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_vclass"
+        android:icon="@drawable/vclass_icon"
+        android:title="@string/title_vclass" />
+
+    <item
+        android:id="@+id/navigation_praktikum"
+        android:icon="@drawable/praktikum_icon"
+        android:title="@string/title_praktikum" />
+
+    <item
+        android:id="@+id/navigation_studentsite"
+        android:icon="@drawable/studentsite_icon"
+        android:title="@string/title_studentsite" />
+
+    <item
+        android:id="@+id/navigation_baak"
+        android:icon="@drawable/baak_icon"
+        android:title="@string/title_baak" />
+
+</menu>

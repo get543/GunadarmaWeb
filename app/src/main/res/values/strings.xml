@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Gunadarma Web</string>
+    <string name="title_vclass">VClass</string>
+    <string name="title_praktikum">Praktikum</string>
+    <string name="title_studentsite">StudentSite</string>
+    <string name="title_baak">BAAK</string>
+</resources>

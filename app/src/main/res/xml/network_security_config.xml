@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow http connection only from this domain -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">gunadarma.ac.id</domain>
+    </domain-config>
+</network-security-config>

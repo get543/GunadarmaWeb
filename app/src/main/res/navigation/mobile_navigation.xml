@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_vclass">
+
+    <fragment
+        android:id="@+id/navigation_vclass"
+        android:name="id.ac.gunadarma.ui.vclass.VclassFragment"
+        android:label="@string/title_vclass"
+        tools:layout="@layout/fragment_vclass" />
+
+    <fragment
+        android:id="@+id/navigation_praktikum"
+        android:name="id.ac.gunadarma.ui.praktikum.PraktikumFragment"
+        android:label="@string/title_praktikum"
+        tools:layout="@layout/fragment_praktikum" />
+
+    <fragment
+        android:id="@+id/navigation_studentsite"
+        android:name="id.ac.gunadarma.ui.studentsite.StudentsiteFragment"
+        android:label="@string/title_studentsite"
+        tools:layout="@layout/fragment_studentsite" />
+
+    <fragment
+        android:id="@+id/navigation_baak"
+        android:name="id.ac.gunadarma.ui.baak.BaakFragment"
+        android:label="@string/title_baak"
+        tools:layout="@layout/fragment_baak" />
+</navigation>
