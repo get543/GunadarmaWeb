@@ -6,8 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+
+import java.util.Objects;
 
 import id.ac.gunadarma.databinding.FragmentVclassBinding;
 import id.ac.gunadarma.viewmodel.BaseWebViewFragment;
@@ -33,6 +36,11 @@ public class VclassFragment extends BaseWebViewFragment {
     @Override
     protected Class<? extends BaseWebViewModel> getViewModelClass() {
         return VclassViewModel.class;
+    }
+
+    @Override
+    protected FrameLayout getFullscreenContainer() {
+        return binding.fullscreenContainer;
     }
 
     // --- Optional: Customize the WebViewClient ---

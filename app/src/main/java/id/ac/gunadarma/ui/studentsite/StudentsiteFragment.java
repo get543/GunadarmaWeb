@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 
@@ -33,6 +34,11 @@ public class StudentsiteFragment extends BaseWebViewFragment {
     @Override
     protected Class<? extends BaseWebViewModel> getViewModelClass() {
         return StudentsiteViewModel.class;
+    }
+
+    @Override
+    protected FrameLayout getFullscreenContainer() {
+        return binding.fullscreenContainer;
     }
 
     // --- Optional: Customize the WebViewClient ---

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<!-- A FrameLayout is great for stacking views, which is perfect for fullscreen. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".ui.studentsite.StudentsiteFragment">
 
     <WebView
         android:id="@+id/StudentsiteWebView"
-        android:importantForAutofill="yes"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- This container will be hidden by default and will hold the fullscreen video -->
+    <FrameLayout
+        android:id="@+id/fullscreen_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        android:visibility="gone"
+        android:background="@android:color/black"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
 
-<!--    android:clipToPadding="false"-->
+<!--android:fitsSystemWindows="true"-->

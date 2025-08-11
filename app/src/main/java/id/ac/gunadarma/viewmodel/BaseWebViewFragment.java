@@ -11,20 +11,18 @@
 
 package id.ac.gunadarma.viewmodel;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
@@ -33,6 +31,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -43,8 +42,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import id.ac.gunadarma.MainActivity;
-import id.ac.gunadarma.databinding.FragmentVclassBinding;
+import id.ac.gunadarma.ActivityViewModel;
 
 public abstract class BaseWebViewFragment extends Fragment {
 
@@ -56,14 +54,23 @@ public abstract class BaseWebViewFragment extends Fragment {
     protected abstract WebView getWebView();
 
     /**
+     * The child fragment must provide its specific fullscreen container.
+     */
+    protected abstract FrameLayout getFullscreenContainer();
+
+    /**
      * The child fragment must provide its specific ViewModel class.
      */
     protected abstract Class<? extends BaseWebViewModel> getViewModelClass();
 
     //* --- Common logic that all child fragments will inherit ---
+    private ActivityViewModel activityViewModel;
     private ActivityResultLauncher<Intent> mUploadMessageLauncher;
     private ValueCallback<Uri[]> mFilePathCallback;
     private Bundle webViewBundle;
+    private View mCustomView;
+    private WebChromeClient.CustomViewCallback mCustomViewCallback;
+    private int mOriginalOrientation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,6 +80,9 @@ public abstract class BaseWebViewFragment extends Fragment {
             // Retrieve the bundle here.
             webViewBundle = savedInstanceState.getBundle("webview_state");
         }
+
+        // Get an instance of the shared ViewModel, scoped to the Activity.
+        activityViewModel = new ViewModelProvider(requireActivity()).get(ActivityViewModel.class);
     }
 
     @Override
@@ -133,6 +143,7 @@ public abstract class BaseWebViewFragment extends Fragment {
 
         // This tells the WebView to not save form data and, critically, not to
         // engage with the autofill framework, which prevents the crash.
+        // For Android 8.0+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             webView.getSettings().setSaveFormData(false);
         }
@@ -207,7 +218,15 @@ public abstract class BaseWebViewFragment extends Fragment {
             @Override
             public void handleOnBackPressed() {
                 WebView webView = getWebView();
-                if (webView != null && webView.canGoBack()) {
+
+                // If the activity is in PiP mode, let the system handle the back press,
+                // which should bring the app back to the foreground.
+                if (getActivity() != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && getActivity().isInPictureInPictureMode()) {
+                    // You can optionally move the task to the front, but often just
+                    // preventing other actions is enough as the system handles dismissal.
+                    getActivity().moveTaskToBack(true); // Example of an action
+
+                } else if (webView != null && webView.canGoBack()) {
                     webView.goBack();
                 } else {
                     setEnabled(false); // Disable this callback
@@ -275,11 +294,8 @@ public abstract class BaseWebViewFragment extends Fragment {
         };
     }
     //! --- END OF DOWNLOAD LISTENER LOGIC ---
-
-    private WebChromeClient createWebChromeClient() {
+    protected WebChromeClient createWebChromeClient() {
         return new WebChromeClient() {
-
-
             //! --- START OF FILE UPLOAD LOGIC REQUEST ---
             @Override
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
@@ -304,8 +320,74 @@ public abstract class BaseWebViewFragment extends Fragment {
 
                 return true; // We've handled the file chooser
             }
-        };
-        //! --- END OF FILE UPLOAD LOGIC REQUEST ---
-    }
+            //! --- END OF FILE UPLOAD LOGIC REQUEST ---
 
+            //! --- START OF FULLSCREEN CUSTOM VIEW ---
+            // This method is called when the webpage wants to ENTER fullscreen.
+            @Override
+            public void onShowCustomView(View view, CustomViewCallback callback) {
+                // Tell the Activity that we are now in fullscreen.
+                activityViewModel.setFullscreen(true);
+
+                // If a view is already showing, hide it first.
+                if (mCustomView != null) {
+                    onHideCustomView();
+                    return;
+                }
+
+                mCustomView = view;
+                mCustomViewCallback = callback;
+
+                if (getActivity() != null) {
+                    // Save the device's current orientation.
+                    mOriginalOrientation = getActivity().getRequestedOrientation();
+                    // Force the screen to landscape mode.
+                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                }
+
+                FrameLayout fullscreenContainer = getFullscreenContainer();
+                if (fullscreenContainer != null) {
+                    fullscreenContainer.addView(mCustomView, new FrameLayout.LayoutParams(-1, -1));
+                    fullscreenContainer.setVisibility(View.VISIBLE);
+                }
+
+                // Hide the system UI for a true fullscreen experience
+                getActivity().getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_FULLSCREEN |
+                                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            }
+
+            // This method is called when the webpage wants to EXIT fullscreen.
+            @Override
+            public void onHideCustomView() {
+                // Tell the Activity that we are no longer in fullscreen.
+                activityViewModel.setFullscreen(false);
+
+                FrameLayout fullscreenContainer = getFullscreenContainer();
+                if (fullscreenContainer != null) {
+                    fullscreenContainer.removeView(mCustomView);
+                    fullscreenContainer.setVisibility(View.GONE);
+                }
+
+                mCustomView = null;
+                // VITAL: Tell the WebView we've finished with the custom view.
+                if (mCustomViewCallback != null) {
+                    mCustomViewCallback.onCustomViewHidden();
+                }
+                mCustomViewCallback = null;
+
+                if (getActivity() != null) {
+                    // Restore the original screen orientation.
+                    getActivity().setRequestedOrientation(mOriginalOrientation);
+                }
+
+                // Show the system UI again
+                getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                // Restore original orientation
+                getActivity().setRequestedOrientation(mOriginalOrientation);
+            }
+        };
+        //! --- END OF FULLSCREEN CUSTOM VIEW ---
+    }
 }

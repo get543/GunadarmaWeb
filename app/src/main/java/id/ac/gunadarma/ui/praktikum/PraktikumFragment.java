@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 
@@ -31,6 +32,11 @@ public class PraktikumFragment extends BaseWebViewFragment {
     }
 
     @Override
+    protected FrameLayout getFullscreenContainer() {
+        return binding.fullscreenContainer;
+    }
+
+    @Override
     protected Class<? extends BaseWebViewModel> getViewModelClass() {
         return PraktikumViewModel.class;
     }
@@ -48,22 +54,43 @@ public class PraktikumFragment extends BaseWebViewFragment {
         };
     }
 
-//    @Override
-//    public void onDestroyView() {
-//        // It's very important to properly destroy the WebView to avoid memory leaks.
-//        WebView webView = getWebView();
-//        if (webView != null) {
-//            // Detach the WebView from its parent
-//            ((ViewGroup) webView.getParent()).removeView(webView);
-//            webView.destroy();
-//        }
-//
-//        binding = null;
-//        super.onDestroyView();
-//    }
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        // It's very important to properly destroy the WebView to avoid memory leaks.
+        WebView webView = getWebView();
+        if (webView != null) {
+            // Detach the WebView from its parent
+            ((ViewGroup) webView.getParent()).removeView(webView);
+            webView.destroy();
+        }
+
         binding = null;
+        super.onDestroyView();
+    }
+
+    /**
+     * This is called when the app goes into the background (e.g., Home button pressed).
+     * We MUST pause the WebView to stop JavaScript, video, and other processing.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        WebView webView = getWebView();
+        if (webView != null) {
+            webView.onPause();
+        }
+    }
+
+    /**
+     * This is called when the app comes back to the foreground.
+     * We resume the WebView here.
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        WebView webView = getWebView();
+        if (webView != null) {
+            webView.onResume();
+        }
     }
 }

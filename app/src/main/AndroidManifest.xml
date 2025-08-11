@@ -24,7 +24,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan"
-            android:configChanges="orientation|screenSize|keyboardHidden"> <!--  ADD THIS LINE -->
+            android:supportsPictureInPicture="true"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,11 +36,11 @@
 
 </manifest>
 
-<!-- fix keyboard crash issue -->
+<!--! fix keyboard crash issue -->
 <!-- android:windowSoftInputMode="adjustPan" -->
 
-<!-- allow all http connection -->
+<!--! allow all http connection -->
 <!-- android:usesCleartextTraffic="true" -->
 
-<!-- fix screen rotation crash -->
-<!--android:configChanges="orientation|screenSize|keyboardHidden" -->
+<!--! fix screen rotation crash -->
+<!-- android:configChanges="orientation|screenSize|keyboardHidden|uiMode" -->

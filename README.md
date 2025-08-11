@@ -11,8 +11,6 @@ A mobile app that renders frequently accessed Gunadarma websites.
 
 ## Download
 
-[//]: # ([![Get it on Google Play]&#40;https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png&#41;]&#40;https://play.google.com/store/apps/details?id=your.package.name&#41;)
-
 [Download Latest](https://github.com/get543/gunadarmaweb/releases/latest)
 
 ## Supported Websites
@@ -25,9 +23,9 @@ A mobile app that renders frequently accessed Gunadarma websites.
 ## Features
 
 - Light/Dark mode
-- Material You design
+- Material design
 - Renders web pages in-app
-- All web's features working as expected
+- All web features working as expected (PiP mode, downloads, uploads, etc.))
 
 ## Installation / Build Instructions
 
